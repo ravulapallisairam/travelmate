@@ -1,0 +1,8 @@
+export const packages = [
+  { id: 1, name: "Bali Adventure Escape", destination: "Bali", image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800", duration: "5 Days", price: 1400, rating: 4.8, includes: ["Hotel", "Food", "Activities", "Transport"] },
+  { id: 2, name: "Romantic Paris Getaway", destination: "Paris", image: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800", duration: "6 Days", price: 2300, rating: 4.9, includes: ["Hotel", "Food", "Eiffel Tour", "Transport"] },
+  { id: 3, name: "Swiss Alps Explorer", destination: "Switzerland", image: "https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=800", duration: "7 Days", price: 2800, rating: 4.9, includes: ["Hotel", "Food", "Cable Car Pass", "Transport"] },
+  { id: 4, name: "Dubai Luxury Experience", destination: "Dubai", image: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800", duration: "4 Days", price: 2000, rating: 4.7, includes: ["5-Star Hotel", "Desert Safari", "Food", "Transport"] },
+  { id: 5, name: "Maldives Honeymoon Special", destination: "Maldives", image: "https://images.unsplash.com/photo-1573843981267-be1999ff37cd?w=800", duration: "5 Days", price: 2600, rating: 5.0, includes: ["Water Villa", "Food", "Snorkeling", "Transfer"] },
+  { id: 6, name: "Kerala Backwater Bliss", destination: "Kerala", image: "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=800", duration: "5 Days", price: 900, rating: 4.6, includes: ["Houseboat", "Food", "Ayurveda Spa", "Transport"] },
+];

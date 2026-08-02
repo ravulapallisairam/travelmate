@@ -1,0 +1,98 @@
+@import "tailwindcss";
+
+@theme {
+  --color-sky-DEFAULT: #0EA5E9;
+  --color-emerald-DEFAULT: #10B981;
+  --color-accent-DEFAULT: #F97316;
+  --font-family-sans: "Poppins", system-ui, sans-serif;
+  --animate-fadeUp: fadeUp 0.6s ease forwards;
+  --animate-float: float 4s ease-in-out infinite;
+
+  @keyframes fadeUp {
+    0% {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes float {
+
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(-12px);
+    }
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #f9fafb;
+  color: #1f2937;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.dark body {
+  background-color: #030712;
+  color: #f3f4f6;
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.dark .glass {
+  background: rgba(17, 24, 39, 0.5);
+  border: 1px solid rgba(55, 65, 81, 0.4);
+}
+
+.btn-primary {
+  padding: 0.75rem 1.5rem;
+  border-radius: 9999px;
+  background: linear-gradient(to right, #0EA5E9, #10B981);
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 10px 15px -3px rgb(14 165 233 / 0.3);
+  transition: all 0.3s;
+}
+
+.btn-primary:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 15px -3px rgb(14 165 233 / 0.5);
+}
+
+.btn-outline {
+  padding: 0.75rem 1.5rem;
+  border-radius: 9999px;
+  border: 2px solid white;
+  color: white;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.btn-outline:hover {
+  background-color: white;
+  color: #0EA5E9;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #0EA5E9;
+  border-radius: 10px;
+}
