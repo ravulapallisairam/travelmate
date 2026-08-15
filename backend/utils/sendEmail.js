@@ -1,9 +1,9 @@
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 export const sendBookingConfirmationEmail = async (to, booking) => {
   try {
+    const resend = new Resend(process.env.RESEND_API_KEY);
+
     await resend.emails.send({
       from: "TravelMate AI <onboarding@resend.dev>",
       to,
