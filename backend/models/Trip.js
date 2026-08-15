@@ -10,12 +10,27 @@ const daySchema = new mongoose.Schema(
   { _id: false }
 );
 
+const budgetBreakdownSchema = new mongoose.Schema(
+  {
+    accommodation: { type: Number, default: 0 },
+    transportation: { type: Number, default: 0 },
+    food: { type: Number, default: 0 },
+    activities: { type: Number, default: 0 },
+    shopping: { type: Number, default: 0 },
+    emergency: { type: Number, default: 0 },
+  },
+  { _id: false }
+);
+
 const tripSchema = new mongoose.Schema(
   {
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     name: { type: String, required: true },
     destination: { type: String, required: true },
+    startDate: { type: Date },
+    endDate: { type: Date },
     days: { type: Number, required: true },
+    travelers: { type: Number, default: 1 },
     budget: { type: Number, required: true },
     travelStyle: { type: String, required: true },
     itinerary: {
@@ -24,6 +39,7 @@ const tripSchema = new mongoose.Schema(
       places: [{ type: String }],
       estimatedBudget: { type: Number },
     },
+    budgetBreakdown: budgetBreakdownSchema,
   },
   { timestamps: true }
 );
