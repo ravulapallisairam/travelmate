@@ -1,6 +1,13 @@
+import { useNavigate } from "react-router-dom";
 import Rating from "./Rating";
 
 export default function PackageCard({ pkg }) {
+  const navigate = useNavigate();
+
+  const handleBookNow = () => {
+    navigate(`/booking/${pkg._id}`, { state: { pkg } });
+  };
+
   return (
     <div className="rounded-2xl overflow-hidden bg-white dark:bg-gray-800 shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
       <div className="relative h-48">
@@ -23,7 +30,9 @@ export default function PackageCard({ pkg }) {
         </div>
         <div className="flex items-center justify-between pt-2">
           <span className="text-xl font-bold text-sky-600 dark:text-sky-400">${pkg.price}</span>
-          <button className="btn-primary !py-2 !px-5 text-sm">Book Now</button>
+          <button onClick={handleBookNow} className="btn-primary !py-2 !px-5 text-sm">
+            Book Now
+          </button>
         </div>
       </div>
     </div>

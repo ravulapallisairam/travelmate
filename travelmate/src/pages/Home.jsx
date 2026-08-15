@@ -5,10 +5,26 @@ import api from "../api/axios";
 import { Link } from "react-router-dom";
 
 const whyUs = [
-  { icon: "🤖", title: "AI Recommendations", desc: "Smart suggestions tailored to your travel taste." },
-  { icon: "🗺️", title: "Smart Planning", desc: "Day-wise itineraries generated instantly." },
-  { icon: "💰", title: "Budget Friendly", desc: "Plans that fit every budget, big or small." },
-  { icon: "✨", title: "Personalized Trips", desc: "Every journey designed around you." },
+  { 
+    icon: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=400&q=80", 
+    title: "AI Recommendations", 
+    desc: "Smart suggestions tailored to your travel taste." 
+  },
+  { 
+    icon: "https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?auto=format&fit=crop&w=400&q=80", 
+    title: "Smart Planning", 
+    desc: "Day-wise itineraries generated instantly." 
+  },
+  { 
+    icon: "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&w=400&q=80", 
+    title: "Budget Friendly", 
+    desc: "Plans that fit every budget, big or small." 
+  },
+  { 
+    icon: "https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=400&q=80", 
+    title: "Personalized Trips", 
+    desc: "Every journey designed around you." 
+  },
 ];
 
 const testimonials = [
@@ -58,8 +74,10 @@ export default function Home() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {whyUs.map((w) => (
-              <div key={w.title} className="glass rounded-2xl p-6 text-center shadow hover:-translate-y-2 transition-all duration-300">
-                <div className="text-4xl mb-3">{w.icon}</div>
+              <div key={w.title} className="glass rounded-2xl p-6 text-center shadow hover:-translate-y-2 transition-all duration-300 flex flex-col items-center">
+                <div className="w-16 h-16 mb-4 rounded-full overflow-hidden shadow-md">
+                  <img src={w.icon} alt={w.title} className="w-full h-full object-cover" />
+                </div>
                 <h3 className="font-bold mb-2">{w.title}</h3>
                 <p className="text-sm text-gray-500 dark:text-gray-400">{w.desc}</p>
               </div>
@@ -77,7 +95,7 @@ export default function Home() {
             <div key={t.name} className="rounded-2xl bg-white dark:bg-gray-800 shadow p-6 space-y-4">
               <p className="text-gray-600 dark:text-gray-300 italic">"{t.text}"</p>
               <div className="flex items-center gap-3">
-                <img src={t.avatar} className="w-10 h-10 rounded-full" />
+                <img src={t.avatar} alt={t.name} className="w-10 h-10 rounded-full" />
                 <span className="font-semibold">{t.name}</span>
               </div>
             </div>

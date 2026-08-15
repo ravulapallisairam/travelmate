@@ -10,11 +10,15 @@ const links = [
   { name: "Packages", path: "/packages" },
   { name: "Favorites", path: "/favorites" },
   { name: "My Trips", path: "/my-trips" },
+  { name: "My Bookings", path: "/my-bookings" },
 ];
+
+const ADMIN_EMAIL = "admin@travelmate.com";
 
 export default function Navbar() {
   const { darkMode, setDarkMode, favorites } = useApp();
   const { user, logout } = useAuth();
+  const isAdmin = user?.email === ADMIN_EMAIL;
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -47,6 +51,18 @@ export default function Navbar() {
               )}
             </NavLink>
           ))}
+          {isAdmin && (
+            <NavLink
+              to="/admin/bookings"
+              className={({ isActive }) =>
+                `text-sm font-bold transition-colors ${
+                  isActive ? "text-emerald-500" : "text-emerald-600 hover:text-emerald-500"
+                }`
+              }
+            >
+              Admin
+            </NavLink>
+          )}
         </div>
 
         <div className="flex items-center gap-3">
@@ -84,6 +100,11 @@ export default function Navbar() {
               {l.name}
             </NavLink>
           ))}
+          {isAdmin && (
+            <NavLink to="/admin/bookings" onClick={() => setOpen(false)} className="text-sm font-bold text-emerald-600">
+              Admin
+            </NavLink>
+          )}
           {user ? (
             <button onClick={handleLogout} className="text-sm font-medium text-red-600 text-left">Logout</button>
           ) : (

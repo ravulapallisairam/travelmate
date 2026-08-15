@@ -31,7 +31,7 @@ export function AppProvider({ children }) {
   const fetchFavorites = async () => {
     try {
       const { data } = await api.get("/favorites");
-      setFavorites(data);
+      setFavorites(data.filter((f) => f != null));
     } catch (err) {
       console.error(err);
     }
@@ -51,11 +51,11 @@ export function AppProvider({ children }) {
       alert("Please log in to save favorites.");
       return;
     }
-    const isFav = favorites.some((f) => f._id === destination._id);
+    const isFav = favorites.some((f) => f?._id === destination._id);
     try {
       if (isFav) {
         await api.delete(`/favorites/${destination._id}`);
-        setFavorites((prev) => prev.filter((f) => f._id !== destination._id));
+        setFavorites((prev) => prev.filter((f) => f?._id !== destination._id));
       } else {
         await api.post("/favorites", { destinationId: destination._id });
         setFavorites((prev) => [...prev, destination]);
@@ -65,7 +65,7 @@ export function AppProvider({ children }) {
     }
   };
 
-  const isFavorite = (id) => favorites.some((f) => f._id === id);
+  const isFavorite = (id) => favorites.some((f) => f?._id === id);
 
   const addTrip = async (trip) => {
     try {
