@@ -1,20 +1,11 @@
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const sendBookingConfirmationEmail = async (to, booking) => {
   try {
-    const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 465,
-      secure: true,
-      family: 4, // force IPv4 to avoid Render's IPv6 ENETUNREACH issue
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-    });
-
-    await transporter.sendMail({
-      from: `"TravelMate AI" <${process.env.EMAIL_USER}>`,
+    await resend.emails.send({
+      from: "TravelMate AI <onboarding@resend.dev>",
       to,
       subject: `Booking Received — ${booking.packageName}`,
       html: `
