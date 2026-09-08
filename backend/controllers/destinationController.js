@@ -48,3 +48,24 @@ export const getDestinationById = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const getRecommendedDestinations = async (req, res) => {
+  try {
+    const User = (await import("../models/User.js")).default;
+    const Favorite = (await import("../models/Favorite.js")).default;
+    const Feedback = (await import("../models/Feedback.js")).default;
+    const { scoreDestinations } = await import("../utils/recommendationEngine.js");
+
+    const user = await User.findById(req.user._id);
+    const favoriteRecords = await Favorite.find({ user: req.user._id }).populate("destination");
+    const favorites = favoriteRecords.map((f) => f.destination).filter(Boolean);
+    const feedbackList = await Feedback.find({ user: req.user._id, type: "recommendation" });
+
+    const allDestinations = await Destination.find();
+    const scored = scoreDestinations(allDestinations, user.preferences, favorites, feedbackList);
+
+    res.json(scored.slice(0, 6));
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

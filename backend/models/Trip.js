@@ -1,8 +1,28 @@
 import mongoose from "mongoose";
 
+const activitySchema = new mongoose.Schema(
+  {
+    title: { type: String, required: true },
+    category: {
+      type: String,
+      enum: ["sightseeing", "food", "adventure", "relaxation", "shopping", "culture"],
+      default: "sightseeing",
+    },
+    startTime: { type: String },
+    endTime: { type: String },
+    estimatedCost: { type: Number, default: 0 },
+    location: { type: String },
+    description: { type: String },
+  },
+  { _id: false }
+);
+
 const daySchema = new mongoose.Schema(
   {
     day: { type: Number, required: true },
+    date: { type: String },
+    activities: { type: [activitySchema], default: [] },
+    // Legacy fields kept so old trips saved before this schema change still load correctly
     morning: { type: String },
     afternoon: { type: String },
     evening: { type: String },

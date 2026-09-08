@@ -20,6 +20,10 @@ const destinationSchema = new mongoose.Schema(
     foodRecommendations: [{ type: String }],
     travelTips: [{ type: String }],
     estimatedDailyBudget: { type: Number },
+    estimatedFlightCostUSD: { type: Number }, // round-trip, rough estimate from a common origin
+    visaRequired: { type: String, enum: ["yes", "no", "visa_on_arrival", "unknown"], default: "unknown" },
+    visaNotes: { type: String },
+    localTransitDailyCostUSD: { type: Number, default: 15 }, // taxis/metro/rideshare per day, rough estimate
     coordinates: {
       lat: { type: Number },
       lng: { type: Number },

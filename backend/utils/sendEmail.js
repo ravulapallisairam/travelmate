@@ -1,11 +1,24 @@
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 
 export const sendBookingConfirmationEmail = async (to, booking) => {
   try {
-    const resend = new Resend(process.env.RESEND_API_KEY);
+    console.log(
+      "DEBUG USER:",
+      process.env.EMAIL_USER,
+      "| DEBUG PASS:",
+      process.env.EMAIL_PASS ? "SET (" + process.env.EMAIL_PASS.length + " chars)" : "MISSING"
+    );
 
-    await resend.emails.send({
-      from: "TravelMate AI <onboarding@resend.dev>",
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    const info = await transporter.sendMail({
+      from: `"TravelMate AI" <${process.env.EMAIL_USER}>`,
       to,
       subject: `Booking Received — ${booking.packageName}`,
       html: `
@@ -24,6 +37,7 @@ export const sendBookingConfirmationEmail = async (to, booking) => {
         </div>
       `,
     });
+    console.log("Booking email sent:", info.messageId);
   } catch (error) {
     console.error("Email failed to send:", error.message);
   }

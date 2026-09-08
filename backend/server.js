@@ -9,6 +9,10 @@ import favoriteRoutes from "./routes/favoriteRoutes.js";
 import tripRoutes from "./routes/tripRoutes.js";
 import aiRoutes from "./routes/aiRoutes.js";
 import bookingRoutes from "./routes/bookingRoutes.js";
+import preferenceRoutes from "./routes/preferenceRoutes.js";
+import feedbackRoutes from "./routes/feedbackRoutes.js";
+import weatherRoutes from "./routes/weatherRoutes.js";
+import copilotRoutes from "./routes/copilotRoutes.js";
 
 dotenv.config();
 connectDB();
@@ -25,6 +29,10 @@ app.use("/api/favorites", favoriteRoutes);
 app.use("/api/trips", tripRoutes);
 app.use("/api/ai", aiRoutes);
 app.use("/api/bookings", bookingRoutes);
+app.use("/api/preferences", preferenceRoutes);
+app.use("/api/feedback", feedbackRoutes);
+app.use("/api/weather", weatherRoutes);
+app.use("/api/copilot", copilotRoutes);
 
 
 

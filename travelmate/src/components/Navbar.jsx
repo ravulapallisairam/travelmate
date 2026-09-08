@@ -11,6 +11,7 @@ const links = [
   { name: "Favorites", path: "/favorites" },
   { name: "My Trips", path: "/my-trips" },
   { name: "My Bookings", path: "/my-bookings" },
+  { name: "Travel DNA", path: "/travel-dna" },
 ];
 
 const ADMIN_EMAIL = "admin@travelmate.com";
@@ -40,14 +41,16 @@ export default function Navbar() {
               key={l.path}
               to={l.path}
               className={({ isActive }) =>
-                `text-sm font-medium transition-colors relative ${
+                `text-sm font-medium transition-colors relative inline-flex items-center ${
                   isActive ? "text-sky-500" : "text-gray-600 dark:text-gray-300 hover:text-sky-500"
                 }`
               }
             >
               {l.name}
               {l.name === "Favorites" && favorites.length > 0 && (
-                <span className="ml-1 text-xs bg-accent text-white rounded-full px-1.5">{favorites.length}</span>
+                <span className="absolute -top-2 -right-3 text-[10px] leading-none bg-accent text-white rounded-full w-4 h-4 flex items-center justify-center">
+                  {favorites.length}
+                </span>
               )}
             </NavLink>
           ))}
@@ -96,8 +99,13 @@ export default function Navbar() {
       {open && (
         <div className="md:hidden flex flex-col gap-3 px-4 pb-4">
           {links.map((l) => (
-            <NavLink key={l.path} to={l.path} onClick={() => setOpen(false)} className="text-sm font-medium text-gray-700 dark:text-gray-200">
+            <NavLink key={l.path} to={l.path} onClick={() => setOpen(false)} className="text-sm font-medium text-gray-700 dark:text-gray-200 relative inline-flex items-center">
               {l.name}
+              {l.name === "Favorites" && favorites.length > 0 && (
+                <span className="absolute -top-2 -right-3 text-[10px] leading-none bg-accent text-white rounded-full w-4 h-4 flex items-center justify-center">
+                  {favorites.length}
+                </span>
+              )}
             </NavLink>
           ))}
           {isAdmin && (

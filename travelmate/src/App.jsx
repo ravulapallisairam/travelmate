@@ -16,6 +16,9 @@ import Compare from "./pages/Compare";
 import Booking from "./pages/Booking";
 import MyBookings from "./pages/MyBookings";
 import AdminBookings from "./pages/AdminBookings";
+import Preferences from "./pages/Preferences";
+import TravelDNA from "./pages/TravelDNA";
+import CopilotPanel from "./components/CopilotPanel";
 
 export default function App() {
   return (
@@ -37,9 +40,12 @@ export default function App() {
           <Route path="*" element={<div className="text-center py-32 text-xl">404 — Page Not Found</div>} />
           <Route path="/my-bookings" element={<ProtectedRoute><MyBookings /></ProtectedRoute>} />
           <Route path="/admin/bookings" element={<ProtectedRoute><AdminBookings /></ProtectedRoute>} />
+          <Route path="/preferences" element={<ProtectedRoute><Preferences /></ProtectedRoute>} />
+          <Route path="/travel-dna" element={<ProtectedRoute><TravelDNA /></ProtectedRoute>} />
         </Routes>
       </main>
       <CompareBar />
+      <CopilotPanel />
       <Footer />
     </div>
   );

@@ -11,6 +11,15 @@ const categoryLabels = {
   emergency: { icon: "🛟", label: "Emergency Fund" },
 };
 
+const activityCategoryColors = {
+  sightseeing: "bg-sky-100 dark:bg-sky-900 text-sky-700 dark:text-sky-300",
+  food: "bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-300",
+  adventure: "bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300",
+  relaxation: "bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300",
+  shopping: "bg-pink-100 dark:bg-pink-900 text-pink-700 dark:text-pink-300",
+  culture: "bg-amber-100 dark:bg-amber-900 text-amber-700 dark:text-amber-300",
+};
+
 const formatDate = (d) => {
   if (!d) return null;
   return new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
@@ -101,11 +110,49 @@ export default function MyTrips() {
                 <div>
                   <h3 className="font-bold text-sm mb-3">Day-wise Itinerary</h3>
                   <div className="space-y-2">
-                    {selected.itinerary.days.map((d) => (
-                      <div key={d.day} className="text-sm rounded-lg bg-gray-50 dark:bg-gray-700 p-3">
-                        <b>Day {d.day}:</b> {d.morning} → {d.afternoon} → {d.evening}
-                      </div>
-                    ))}
+                    {selected.itinerary.days.map((d) => {
+                      const hasActivities = Array.isArray(d.activities) && d.activities.length > 0;
+                      const hasLegacyFields = d.morning || d.afternoon || d.evening;
+
+                      return (
+                        <div key={d.day} className="text-sm rounded-lg bg-gray-50 dark:bg-gray-700 p-3">
+                          <b>Day {d.day}</b>
+                          {d.date && <span className="text-xs text-gray-400 ml-2">{formatDate(d.date)}</span>}
+
+                          {hasActivities ? (
+                            <div className="mt-2 space-y-2">
+                              {d.activities.map((a, i) => (
+                                <div key={i} className="flex flex-wrap items-center gap-2">
+                                  <span className="text-xs font-mono text-gray-400 whitespace-nowrap">
+                                    {a.startTime}–{a.endTime}
+                                  </span>
+                                  <span className="font-semibold">{a.title}</span>
+                                  {a.category && (
+                                    <span className={`text-xs px-2 py-0.5 rounded-full ${activityCategoryColors[a.category] || activityCategoryColors.sightseeing}`}>
+                                      {a.category}
+                                    </span>
+                                  )}
+                                  {a.location && (
+                                    <span className="text-xs text-gray-500 dark:text-gray-400">📍 {a.location}</span>
+                                  )}
+                                  {typeof a.estimatedCost === "number" && (
+                                    <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 ml-auto">
+                                      ${a.estimatedCost}
+                                    </span>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          ) : hasLegacyFields ? (
+                            <span className="ml-2">
+                              {d.morning} → {d.afternoon} → {d.evening}
+                            </span>
+                          ) : (
+                            <p className="text-xs text-gray-400 italic mt-1">No activities recorded for this day.</p>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               )}
