@@ -4,7 +4,7 @@ import SearchBar from "./SearchBar";
 export default function Hero() {
   return (
     <section
-      className="relative min-h-[90vh] flex items-center justify-center text-white overflow-hidden"
+      className="relative min-h-[500px] sm:min-h-[90vh] flex items-center justify-center text-white overflow-hidden"
       style={{
         backgroundImage: `linear-gradient(rgba(0,0,0,0.45),rgba(0,0,0,0.55)), url(https://images.unsplash.com/photo-1500835556837-99ac94a94552?w=1600)`,
         backgroundSize: "cover",

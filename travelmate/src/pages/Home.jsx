@@ -79,7 +79,7 @@ export default function Home() {
       <Hero />
 
       {user && (
-        <section className="max-w-7xl mx-auto px-6 py-16">
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 py-10 md:py-16">
           <div className="flex items-center justify-between mb-2 flex-wrap gap-3">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-sky-500 to-emerald-500 flex items-center justify-center shadow-lg shadow-sky-500/20">

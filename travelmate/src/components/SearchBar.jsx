@@ -21,7 +21,7 @@ export default function SearchBar({ variant = "light" }) {
       <input
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        placeholder="Search destinations, countries..."
+        placeholder="Search destinations..."
         className="flex-1 bg-transparent outline-none px-2 py-2 text-gray-700 dark:text-gray-100 placeholder:text-gray-400"
       />
       <button type="submit" className="btn-primary !px-5 !py-2 text-sm">Search</button>
