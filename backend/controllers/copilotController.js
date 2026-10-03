@@ -1,6 +1,7 @@
 import { classifyIntent, structuredGenerate } from "../services/aiService.js";
 import { INTENTS } from "../services/copilotIntents.js";
 import * as tools from "../services/copilotTools.js";
+import { retrieveDestinationKnowledge } from "../services/ragService.js";
 
 const buildResponsePrompt = (userMessage, intent, toolResults) => {
   const trustData = toolResults.verifyCurrentInfo;
@@ -25,6 +26,33 @@ Rules:
 
 Respond ONLY with JSON, no markdown:
 { "reply": "your natural language response" }`;
+};
+
+// RAG-grounded prompt — the LLM answers ONLY from retrieved chunks, and
+// must explicitly say when something isn't covered (Phase 11's hallucination
+// control: "I don't have verified information for that").
+const buildRagPrompt = (userMessage, retrieval) => {
+  if (!retrieval.found) {
+    return null; // no destination matched, handled separately
+  }
+
+  const chunksText = retrieval.retrievedChunks.map((c) => `[${c.source}] ${c.content}`).join("\n");
+
+  return `You are the TravelMate AI Copilot answering a question about ${retrieval.destination.name}, ${retrieval.destination.country}.
+
+User's question: "${userMessage}"
+
+RETRIEVED KNOWLEDGE (this is the ONLY information you may use — do not add facts not present here):
+${chunksText}
+
+Rules:
+- Answer using ONLY the retrieved knowledge above.
+- If the retrieved knowledge doesn't fully answer the question, say so plainly: "I don't have verified information on [the missing part]."
+- Never invent attractions, prices, opening hours, or facts not in the retrieved knowledge.
+- Be conversational, 2-4 sentences.
+
+Respond ONLY with JSON, no markdown:
+{ "reply": "your answer" }`;
 };
 
 const buildProposalPrompt = (userMessage, actionType, proposalResult) => {
@@ -55,6 +83,7 @@ const runToolsForIntent = async (intentDef, context) => {
 };
 
 export const sendCopilotMessage = async (req, res) => {
+  const startTime = Date.now();
   try {
     const { message, tripId } = req.body;
     const userId = req.user._id;
@@ -138,13 +167,43 @@ export const sendCopilotMessage = async (req, res) => {
       });
     }
 
-    // READ-ONLY PATH: run tools, answer directly (unchanged from before)
+    // READ-ONLY PATH
     const context = {
       userId,
       tripId: resolvedTripId,
       message,
       destinationName: currentTripResult.trip.destination,
     };
+
+    // DESTINATION_INFO uses RAG — retrieve relevant knowledge chunks instead
+    // of just dumping the raw destination document into the prompt.
+    if (intentDef.name === "DESTINATION_INFO") {
+      // Uses the current trip's destination as a sensible default.
+      const destinationName = currentTripResult.trip.destination;
+      const retrieval = await retrieveDestinationKnowledge({ destinationName, question: message });
+
+      if (!retrieval.found) {
+        return res.json({ reply: `I don't have verified information about that destination yet.`, suggestsAction: false, intent: intentDef.name });
+      }
+
+      const ragPrompt = buildRagPrompt(message, retrieval);
+      let ragResponse;
+      try {
+        ragResponse = await structuredGenerate(ragPrompt);
+      } catch (err) {
+        console.error("[Copilot-RAG] Response generation failed:", err.message);
+        return res.json({ reply: "I'm having trouble retrieving that information right now.", suggestsAction: false, intent: intentDef.name });
+      }
+
+      console.log(`[Copilot-RAG] DESTINATION_INFO answered (${retrieval.retrievedChunks.length} chunks) in ${Date.now() - startTime}ms`);
+      return res.json({
+        reply: ragResponse.reply,
+        suggestsAction: false,
+        intent: intentDef.name,
+        sources: retrieval.retrievedChunks.map((c) => c.source),
+      });
+    }
+
     const toolResults = await runToolsForIntent(intentDef, context);
     toolResults.getCurrentTrip = currentTripResult; // reuse what we already fetched
 
