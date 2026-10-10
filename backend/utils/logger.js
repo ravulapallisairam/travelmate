@@ -5,6 +5,7 @@ const format = (level, args) => [`[${new Date().toISOString()}] [${level}]`, ...
 
 const logger = {
   info: (...args) => console.log(...format("INFO", args)),
+  log: (...args) => console.log(...format("INFO", args)),
   warn: (...args) => console.warn(...format("WARN", args)),
   error: (...args) => console.error(...format("ERROR", args)),
   debug: (...args) => {
@@ -12,6 +13,9 @@ const logger = {
       console.debug(...format("DEBUG", args));
     }
   },
+  // Used for timing / counters, e.g. logger.metric("copilot_latency_ms", 123, { intent })
+  metric: (name, value, tags = {}) =>
+    console.log(...format("METRIC", [name, value, Object.keys(tags).length ? tags : ""].filter((x) => x !== ""))),
 };
 
 export default logger;
