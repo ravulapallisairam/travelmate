@@ -1,6 +1,6 @@
 // AI Service Abstraction
-// Business logic calls generate()/structuredGenerate() — never talks to
-// Gemini directly. Swapping providers later means changing only this file.
+// Business logic calls generate()/structuredGenerate()/classifyIntent() and never
+// talks to Gemini directly. Swapping providers later means changing only this file.
 
 const MODELS = ["gemini-flash-latest", "gemini-3.5-flash-lite"];
 
@@ -69,8 +69,6 @@ const callGemini = async (prompt) => {
   throw lastError;
 };
 
-// Public API — this is what the rest of the app should call.
-
 export const generate = async (prompt) => {
   const { text } = await callGemini(prompt);
   return text;
@@ -82,8 +80,7 @@ export const structuredGenerate = async (prompt, { maxRetries = 2 } = {}) => {
     try {
       const { text } = await callGemini(prompt);
       lastRawText = text;
-      const cleaned = extractJson(text);
-      return JSON.parse(cleaned);
+      return JSON.parse(extractJson(text));
     } catch (err) {
       if (attempt === maxRetries) {
         console.error("structuredGenerate failed, last raw text:", lastRawText);
@@ -93,10 +90,18 @@ export const structuredGenerate = async (prompt, { maxRetries = 2 } = {}) => {
   }
 };
 
-export const classifyIntent = async (userMessage, availableIntents) => {
-  const prompt = `Classify the user's travel-related request into exactly one intent.
+// history: [{ role: "user" | "assistant", text }] — already sanitized by the caller.
+// It is used only to resolve references such as "it", "that", or "the second one".
+export const classifyIntent = async (userMessage, availableIntents, history = []) => {
+  const historyBlock = history.length
+    ? `Recent conversation (use only to resolve references like "it" or "that"):\n${history
+        .map((m) => `${m.role === "user" ? "User" : "Copilot"}: ${m.text}`)
+        .join("\n")}\n\n`
+    : "";
 
-User message: "${userMessage}"
+  const prompt = `Classify the user's latest travel-related request into exactly one intent.
+
+${historyBlock}Latest user message: "${userMessage}"
 
 Available intents:
 ${availableIntents.map((i) => `- ${i.name}: ${i.description}`).join("\n")}

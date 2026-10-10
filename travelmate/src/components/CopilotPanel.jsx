@@ -1,7 +1,12 @@
 import { useState, useRef, useEffect } from "react";
-import { Sparkles, X, Send, Loader2, Check, ArrowRight } from "lucide-react";
+import { Sparkles, X, Send, Loader2, Check, ArrowRight, RotateCcw } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import api from "../api/axios";
+
+const GREETING = {
+  role: "assistant",
+  text: "Hi! I'm your TravelMate Copilot. Ask me about your saved trips, budget, weather, or destinations.",
+};
 
 const quickActions = [
   "Show my current trip",
@@ -13,12 +18,16 @@ const quickActions = [
 function ProposalCard({ proposal, onApply, onKeep }) {
   const [applying, setApplying] = useState(false);
   const [applied, setApplied] = useState(false);
+  const [failed, setFailed] = useState(false);
 
   const handleApply = async () => {
     setApplying(true);
+    setFailed(false);
     try {
       await onApply(proposal);
       setApplied(true);
+    } catch {
+      setFailed(true);
     } finally {
       setApplying(false);
     }
@@ -59,6 +68,8 @@ function ProposalCard({ proposal, onApply, onKeep }) {
         </ul>
       )}
 
+      {failed && <p className="text-xs text-red-500">Couldn't apply the changes. Please try again.</p>}
+
       <div className="flex gap-2 pt-1">
         <button
           onClick={onKeep}
@@ -82,9 +93,7 @@ function ProposalCard({ proposal, onApply, onKeep }) {
 export default function CopilotPanel() {
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
-  const [messages, setMessages] = useState([
-    { role: "assistant", text: "Hi! I'm your TravelMate Copilot. Ask me about your trips, budget, weather, or destinations." },
-  ]);
+  const [messages, setMessages] = useState([GREETING]);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const scrollRef = useRef(null);
@@ -99,12 +108,20 @@ export default function CopilotPanel() {
     const trimmed = text.trim();
     if (!trimmed || sending) return;
 
+    // Conversation memory: the last 6 real messages (greeting and errors excluded)
+    // are sent along so follow-ups like "make it cheaper" or "what about day 2?" work.
+    const history = messages
+      .slice(1)
+      .filter((m) => !m.isError && m.text)
+      .slice(-6)
+      .map((m) => ({ role: m.role, text: m.text }));
+
     setMessages((prev) => [...prev, { role: "user", text: trimmed }]);
     setInput("");
     setSending(true);
 
     try {
-      const { data } = await api.post("/copilot/message", { message: trimmed });
+      const { data } = await api.post("/copilot/message", { message: trimmed, history });
       setMessages((prev) => [
         ...prev,
         {
@@ -116,7 +133,17 @@ export default function CopilotPanel() {
       ]);
     } catch (err) {
       console.error(err);
-      setMessages((prev) => [...prev, { role: "assistant", text: "Something went wrong reaching the Copilot. Please try again.", isError: true }]);
+      const rateLimited = err.response?.status === 429;
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          text: rateLimited
+            ? "You're sending requests too quickly. Please wait a moment and try again."
+            : "Something went wrong reaching the Copilot. Please try again.",
+          isError: true,
+        },
+      ]);
     } finally {
       setSending(false);
     }
@@ -131,6 +158,11 @@ export default function CopilotPanel() {
 
   const handleKeepProposal = (index) => {
     setMessages((prev) => prev.map((m, i) => (i === index ? { ...m, proposal: null, kept: true } : m)));
+  };
+
+  const clearConversation = () => {
+    setMessages([GREETING]);
+    setInput("");
   };
 
   const handleSubmit = (e) => {
@@ -157,9 +189,25 @@ export default function CopilotPanel() {
               <Sparkles size={18} />
               <span className="font-bold text-sm">TravelMate Copilot</span>
             </div>
-            <button onClick={() => setOpen(false)} className="w-7 h-7 rounded-full hover:bg-white/20 flex items-center justify-center">
-              <X size={16} />
-            </button>
+            <div className="flex items-center gap-1">
+              {messages.length > 1 && (
+                <button
+                  onClick={clearConversation}
+                  className="w-7 h-7 rounded-full hover:bg-white/20 flex items-center justify-center"
+                  aria-label="Clear conversation"
+                  title="Clear conversation"
+                >
+                  <RotateCcw size={14} />
+                </button>
+              )}
+              <button
+                onClick={() => setOpen(false)}
+                className="w-7 h-7 rounded-full hover:bg-white/20 flex items-center justify-center"
+                aria-label="Close Copilot"
+              >
+                <X size={16} />
+              </button>
+            </div>
           </div>
 
           <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-3">
@@ -183,9 +231,7 @@ export default function CopilotPanel() {
                   </div>
                 )}
 
-                {m.kept && (
-                  <div className="mt-2 text-xs text-gray-400 italic">Kept current plan.</div>
-                )}
+                {m.kept && <div className="mt-2 text-xs text-gray-400 italic">Kept current plan.</div>}
               </div>
             ))}
             {sending && (
