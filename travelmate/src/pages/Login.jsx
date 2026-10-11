@@ -4,7 +4,6 @@ import { Eye, EyeOff } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import AuthLayout from "../components/AuthLayout";
 
-
 export default function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
@@ -14,6 +13,7 @@ export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const sessionExpired = new URLSearchParams(location.search).get("expired") === "1";
 
   const triggerShake = () => {
     setShake(true);
@@ -37,6 +37,15 @@ export default function Login() {
 
   return (
     <AuthLayout title="Welcome back" subtitle="Log in to continue planning your next trip.">
+      {sessionExpired && (
+        <div
+          role="status"
+          className="flex items-center gap-2 rounded-xl bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-300 text-sm px-4 py-3 mb-6 animate-banner"
+        >
+          <span>⏱️</span> Your session expired. Please log in again.
+        </div>
+      )}
+
       {location.state?.registered && (
         <div
           role="status"
@@ -92,7 +101,7 @@ export default function Login() {
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               aria-label={showPassword ? "Hide password" : "Show password"}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition"
             >
               {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
             </button>
