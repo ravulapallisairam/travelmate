@@ -2,7 +2,7 @@
 // Business logic calls generate()/structuredGenerate()/classifyIntent() and never
 // talks to Gemini directly. Swapping providers later means changing only this file.
 
-const MODELS = ["gemini-flash-latest", "gemini-3.5-flash-lite"];
+const MODELS = ["gemini-3.5-flash-lite", "gemini-flash-latest"];
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 

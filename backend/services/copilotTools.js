@@ -355,16 +355,24 @@ export const prepareWeatherReplan = async ({ userId, tripId }) => {
  * Output: { success, trip } | { error }
  * The ONLY function in the tool layer that writes to the database.
  * Ownership is enforced (only updates a trip belonging to userId).
+ * The browser's copy of the plan is untrusted, so it is rebuilt from
+ * whitelisted, length-limited fields before saving.
  * This must only ever be called after the frontend shows the user the
  * proposal and they explicitly click "Apply" (Phase 17).
  */
 export const applyProposedChanges = async ({ userId, tripId, proposedDays }) => {
   const Trip = (await import("../models/Trip.js")).default;
+  const { sanitizeProposedDays } = await import("../utils/sanitizeItinerary.js");
 
+  // Ownership is enforced in the query itself.
   const trip = await Trip.findOne({ _id: tripId, user: userId });
   if (!trip) return { error: "Trip not found or not owned by this user." };
 
-  trip.itinerary.days = proposedDays;
+  // The browser's copy of the plan is untrusted: rebuild it from whitelisted fields.
+  const checked = sanitizeProposedDays(proposedDays, { expectedDays: trip.itinerary?.days?.length });
+  if (checked.error) return { error: checked.error };
+
+  trip.itinerary.days = checked.days;
   await trip.save();
 
   return { success: true, trip };
